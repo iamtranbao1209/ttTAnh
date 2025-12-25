@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Study Zone: Space Mission</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron (Sci-fi) & Exo 2 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --space-bg: #030712;
+            --panel-bg: rgba(17, 24, 39, 0.8);
+            --grid-border: #1e293b;
+            --study-neon: #3b82f6; /* Blue Neon */
+            --leisure-neon: #f97316; /* Orange Neon */
+            --text-glow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        body {
+            background-color: var(--space-bg);
+            color: #e2e8f0;
+            font-family: 'Exo 2', sans-serif;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            animation: stars 60s linear infinite;
+        }
+
+        @keyframes stars {
+            from { background-position: 0 0, 40px 60px, 130px 270px; }
+            to { background-position: 550px 550px, 390px 410px, 380px 520px; }
+        }
+
+        h1, h2, .sci-fi-text {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.1em;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Grid Styling */
+        .grid-cell {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            color: #64748b;
+            text-shadow: none;
+        }
+
+        .grid-cell:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-color: #60a5fa;
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            z-index: 10;
+            transform: scale(1.1);
+        }
+
+        .grid-cell.selected {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        /* Found Words Styling */
+        .grid-cell.found.study {
+            background-color: var(--study-neon);
+            color: #fff;
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px var(--study-neon);
+            animation: pulse-blue 2s infinite;
+        }
+
+        .grid-cell.found.leisure {
+            background-color: var(--leisure-neon);
+            color: #fff;
+            border-color: #fdba74;
+            box-shadow: 0 0 15px var(--leisure-neon);
+            animation: pulse-orange 2s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 10px var(--study-neon); }
+            50% { box-shadow: 0 0 25px var(--study-neon); }
+        }
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 0 10px var(--leisure-neon); }
+            50% { box-shadow: 0 0 25px var(--leisure-neon); }
+        }
+
+        /* Card Styling for Phase 2 */
+        .mission-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 4px solid #475569;
+            transition: all 0.3s;
+        }
+        
+        .mission-card:hover {
+            transform: translateX(5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .mission-card.study { border-left-color: var(--study-neon); }
+        .mission-card.leisure { border-left-color: var(--leisure-neon); }
+
+        .mission-card.solved {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: #10b981;
+            opacity: 0.6;
+        }
+
+        .mission-card.solved .word-reveal {
+            color: #10b981;
+            text-shadow: 0 0 5px #10b981;
+        }
+
+        /* Phase 1 Styles */
+        .hint-chip {
+            transition: all 0.5s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hint-chip.solved {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #4ade80;
+            border-color: #22c55e;
+            text-decoration: line-through;
+            opacity: 0.5;
+            animation: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .terminal-input {
+            caret-color: #3b82f6;
+            animation: glow-border 2s infinite alternate;
+        }
+
+        @keyframes glow-border {
+            from { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
+            to { box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+        }
+
+        .word-slot {
+            transition: all 0.3s;
+        }
+        .word-slot.revealed {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #60a5fa;
+            color: #fff;
+            text-shadow: 0 0 10px #3b82f6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Countdown Animation */
+        @keyframes countdown-pulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-countdown {
+            animation: countdown-pulse 0.8s ease-out forwards;
+        }
+
+        .cursor-crosshair-custom {
+            cursor: crosshair;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+            animation: scan 3s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header / HUD -->
+    <header class="border-b border-slate-800 bg-slate-900/80 p-3 shadow-2xl z-20 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-blue-500 blur rounded-full opacity-50 animate-pulse"></div>
+                    <i class="fas fa-user-astronaut text-3xl text-white relative z-10"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 font-black sci-fi-text uppercase">Galactic Study Zone</h1>
+                    <p class="text-xs text-blue-300 font-mono tracking-widest">VOCABULARY REINFORCEMENT SYSTEM</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                 <button onclick="activateHack()" class="group relative px-4 py-2 bg-red-900/30 border border-red-500/50 rounded hover:bg-red-500/20 transition-all overflow-hidden" title="Kích hoạt gian lận">
+                    <div class="absolute inset-0 w-0 bg-red-500/20 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+                    <span class="relative text-xs font-bold text-red-400 sci-fi-text group-hover:text-red-300"><i class="fas fa-terminal"></i> HACK</span>
+                </button>
+
+                <!-- Timer Display -->
+                <div class="bg-slate-800/80 px-4 py-2 rounded border border-blue-500/30 flex flex-col items-end min-w-[100px]">
+                    <span class="text-[10px] text-blue-300 uppercase tracking-widest"><i class="fas fa-clock mr-1"></i> Time</span>
+                    <span id="timer" class="text-xl text-white font-bold sci-fi-text font-mono">00:00</span>
+                </div>
+
+                <div class="bg-slate-800/80 px-5 py-2 rounded border border-blue-500/30 flex flex-col items-end">
+                    <span class="text-[10px] text-blue-300 uppercase tracking-widest">Progress</span>
+                    <span class="text-xl text-white font-bold sci-fi-text"><span id="found-count" class="text-blue-400">0</span><span class="text-slate-500">/</span>10</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 overflow-hidden w-full relative">
+        
+        <!-- PHASE 1: DECRYPTION (Initially Visible) -->
+        <section id="phase-1-decrypt" class="w-full h-full flex flex-col hidden">
+            <!-- Instruction Header -->
+            <div class="p-4 text-center z-10">
+                <h2 class="text-xl md:text-2xl font-bold text-white sci-fi-text mb-2 animate-pulse">
+                    <i class="fas fa-fingerprint mr-2"></i> ANALYZE SIGNAL FRAGMENTS
+                </h2>
+                <p class="text-blue-300 font-mono text-xs md:text-sm max-w-3xl mx-auto bg-slate-900/60 p-2 rounded border border-blue-500/20">
+                    <span class="text-yellow-400 font-bold">INSTRUCTIONS:</span> Below are fragmented data hints. Connect the dots mentally and type the keyword into the Command Line to decrypt.
+                </p>
+            </div>
+
+            <!-- Hint Cloud -->
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div id="data-cloud" class="flex flex-wrap justify-center gap-3 max-w-5xl mx-auto py-4">
+                    <!-- Hints injected here -->
+                </div>
+            </div>
+
+            <!-- Command Line & Progress -->
+            <div class="bg-slate-900/90 border-t border-slate-700 p-4 md:p-6 shadow-2xl z-20">
+                <div class="max-w-4xl mx-auto flex flex-col gap-4">
+                    
+                    <!-- Decrypted List Display -->
+                    <div id="decrypted-list" class="flex flex-wrap gap-2 justify-center mb-2">
+                        <!-- Word slots injected here -->
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt blur"></div>
+                        <div class="relative flex items-center bg-slate-900 rounded-lg">
+                            <span class="pl-4 text-green-500 font-mono font-bold text-xl">></span>
+                            <input type="text" 
+                                   id="master-input"
+                                   class="w-full bg-transparent text-white font-mono text-xl p-4 focus:outline-none uppercase placeholder-slate-600 tracking-widest"
+                                   placeholder="TYPE KEYWORD HERE..."
+                                   autocomplete="off">
+                            <button onclick="checkMasterInput()" class="px-6 py-2 m-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold sci-fi-text transition-colors">
+                                ENTER
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <span id="input-feedback" class="text-xs font-mono h-4 block tracking-widest transition-colors duration-300">AWAITING INPUT...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- PHASE 2: GRID MISSION (Initially Hidden) -->
+        <div id="phase-2-grid" class="flex flex-col lg:flex-row h-full hidden opacity-0 transition-opacity duration-1000">
+            
+            <!-- LEFT PANEL: Data Logs (Hints) -->
+            <aside class="w-full lg:w-1/3 p-4 flex flex-col h-full z-10 bg-slate-900/60 border-r border-slate-800 backdrop-blur-sm">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-700 pb-2">
+                    <h2 class="text-sm font-bold text-blue-300 sci-fi-text flex items-center gap-2">
+                        <i class="fas fa-database"></i> DECRYPTED LOGS
+                    </h2>
+                    <div class="flex gap-3 text-[10px] font-mono uppercase">
+                        <span class="flex items-center gap-1 text-blue-400"><i class="fas fa-circle text-[6px]"></i> Study</span>
+                        <span class="flex items-center gap-1 text-orange-400"><i class="fas fa-circle text-[6px]"></i> Leisure</span>
+                    </div>
+                </div>
+                
+                <div id="hints-container" class="space-y-2 overflow-y-auto pr-2 pb-20 flex-1">
+                    <!-- Mission Cards injected here -->
+                </div>
+            </aside>
+
+            <!-- RIGHT PANEL: Star Map (Grid) -->
+            <section class="w-full lg:w-2/3 p-4 flex flex-col items-center justify-center relative bg-slate-900/40">
+                
+                <div class="glass-panel p-2 rounded-lg relative overflow-hidden shadow-[0_0_50px_rgba(59,130,246,0.1)]">
+                    <!-- Corner Accents -->
+                    <div class="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-blue-500"></div>
+                    <div class="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-blue-500"></div>
+                    <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-blue-500"></div>
+                    <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-blue-500"></div>
+                    
+                    <!-- Scan line effect -->
+                    <div class="scan-line"></div>
+
+                    <div id="word-grid" class="grid gap-px bg-slate-800/50 transition-all duration-500" 
+                         style="grid-template-columns: repeat(15, minmax(20px, 1fr)); width: 100%; max-width: 600px;">
+                        <!-- Grid Cells -->
+                    </div>
+                </div>
+
+                <div class="mt-6 font-mono text-xs text-blue-300/70 bg-slate-900/80 px-4 py-2 rounded border border-blue-500/20">
+                    <i class="fas fa-arrows-alt"></i> DRAG CURSOR TO SCAN SECTOR
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Start Overlay (3-2-1) -->
+    <div id="countdown-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-[6px] transition-all duration-300 cursor-pointer group">
+        <div id="countdown-label" class="text-blue-300 text-xs tracking-[0.5em] mb-4 uppercase animate-pulse">Awaiting Manual Input...</div>
+        <div id="countdown-text" class="text-3xl md:text-4xl font-bold text-white sci-fi-text drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] group-hover:scale-110 transition-transform duration-300">
+            <i class="fas fa-power-off mr-2"></i> INITIALIZE
+        </div>
+        <div id="click-hint" class="mt-4 text-blue-500/70 text-[10px] font-mono uppercase tracking-widest border border-blue-500/30 px-3 py-1 rounded">
+            [ Tap anywhere to start ]
+        </div>
+    </div>
+
+    <!-- Victory/Result Modal -->
+    <div id="result-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-slate-900 border border-blue-500 p-8 rounded-lg max-w-md w-full text-center shadow-[0_0_50px_rgba(59,130,246,0.3)] transform scale-100 transition-transform relative overflow-hidden">
+            <!-- Background glow -->
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
+            
+            <i id="modal-icon" class="fas fa-medal text-6xl text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i>
+            
+            <h2 id="modal-title" class="text-3xl font-bold text-white mb-2 sci-fi-text tracking-widest">MISSION ACCOMPLISHED</h2>
+            <p id="modal-desc" class="text-blue-200 mb-2 font-mono text-sm">All vocabulary data has been successfully retrieved.</p>
+            
+            <!-- Time Result Display -->
+            <div class="bg-blue-900/30 border border-blue-500/30 rounded p-3 mb-8 inline-block">
+                <p class="text-blue-300 text-xs uppercase tracking-widest mb-1">Mission Duration</p>
+                <p id="final-time" class="text-2xl font-bold text-white sci-fi-text font-mono">00:00</p>
+            </div>
+            
+            <br>
+
+            <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded border border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.5)] transition-all uppercase sci-fi-text tracking-wider hover:scale-105">
+                Re-initialize
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA SETUP ---
+        const GRID_SIZE = 15;
+        
+        // 5 Study (Grammar/Vocab) + 5 Leisure Words
+        const originalData = [
+            // SECTOR 1: STUDY ZONE (Blue)
+            {
+                word: "VOCABULARY",
+                category: "STUDY",
+                hints: ["Words you know", "Building blocks of language", "Listed in dictionary"]
+            },
+            {
+                word: "PRESENTATION",
+                category: "STUDY",
+                hints: ["Speaking to an audience", "Using slides", "Public speaking task"]
+            },
+            {
+                word: "RESEARCH",
+                category: "STUDY",
+                hints: ["Finding information", "Looking for sources", "Google Scholar"]
+            },
+            {
+                word: "SEMESTER",
+                category: "STUDY",
+                hints: ["Half of academic year", "School term", "Several months long"]
+            },
+            {
+                word: "PROJECT",
+                category: "STUDY",
+                hints: ["Group work task", "Has a specific goal", "Science fair entry"]
+            },
+            // SECTOR 2: LEISURE ZONE (Orange)
+            {
+                word: "FESTIVAL",
+                category: "LEISURE",
+                hints: ["Cultural celebration", "Music event", "Food and fun"]
+            },
+            {
+                word: "ADVENTURE",
+                category: "LEISURE",
+                hints: ["Exciting experience", "Exploring new places", "Risky but fun"]
+            },
+            {
+                word: "BADMINTON",
+                category: "LEISURE",
+                hints: ["Racket sport", "Hit the shuttlecock", "Played over a net"]
+            },
+            {
+                word: "CAMPING",
+                category: "LEISURE",
+                hints: ["Sleeping in a tent", "Bonfire", "Living in nature"]
+            },
+            {
+                word: "TRAVEL",
+                category: "LEISURE",
+                hints: ["Going to other countries", "Tourism", "Pack your suitcase"]
+            }
+        ];
+
+        // --- GAME ENGINE ---
+        let grid = [];
+        let placedWords = [];
+        let isSelecting = false;
+        let selectionStart = null;
+        let selectionEnd = null;
+        let foundWordsCounter = 0; // For Phase 2
+        let decryptedWords = []; // For Phase 1
+        
+        // Anti-Cheat & State Variables
+        let isGameRunning = false;
+        let hasCheated = false;
+        let cheatReason = ""; // "HACK" or "TAB_SWITCH"
+        
+        // Timer Variables
+        let timerInterval;
+        let secondsElapsed = 0;
+
+        function initGame() {
+            grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
+            placedWords = [];
+            decryptedWords = [];
+            
+            // Randomly place words in memory (ready for Phase 2)
+            originalData.forEach(item => placeWord(item));
+            fillEmptySpaces();
+            
+            // Initialize Start Screen logic (Wait for click)
+            setupStartScreen();
+            
+            // Setup Anti-Cheat Blur Detection
+            window.addEventListener('blur', handleWindowBlur);
+
+            // Add enter key support
+            document.getElementById('master-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    checkMasterInput();
+                }
+            });
+        }
+
+        // --- ANTI-CHEAT HANDLERS ---
+        
+        function handleWindowBlur() {
+            if (isGameRunning && !hasCheated) {
+                // If game is running and user switches tab
+                hasCheated = true;
+                cheatReason = "TAB_SWITCH";
+                stopTimer();
+                isGameRunning = false;
+                showResultModal(false);
+            }
+        }
+
+        function activateHack() {
+            if (!isGameRunning) return;
+            hasCheated = true;
+            cheatReason = "HACK";
+            
+            // Auto complete whatever phase we are in
+            if (decryptedWords.length < originalData.length) {
+                // Phase 1: Reveal remaining
+                originalData.forEach(item => {
+                    if (!decryptedWords.includes(item.word)) {
+                        document.getElementById('master-input').value = item.word;
+                        checkMasterInput();
+                    }
+                });
+            } else {
+                // Phase 2
+                placedWords.forEach(pw => markFound(pw));
+            }
+        }
+
+        // --- START LOGIC ---
+        
+        function setupStartScreen() {
+            const overlay = document.getElementById('countdown-overlay');
+            const startHandler = () => {
+                overlay.removeEventListener('click', startHandler);
+                overlay.classList.remove('cursor-pointer');
+                document.getElementById('click-hint').style.display = 'none';
+                startCountdownSequence();
+            };
+            overlay.addEventListener('click', startHandler);
+        }
+
+        function startCountdownSequence() {
+            const text = document.getElementById('countdown-text');
+            const label = document.getElementById('countdown-label');
+            const overlay = document.getElementById('countdown-overlay');
+
+            label.innerText = "System Initializing...";
+            text.className = "text-8xl md:text-9xl font-black text-white sci-fi-text drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-countdown";
+            
+            let count = 3;
+            text.innerText = count;
+            
+            const refreshAnimation = () => {
+                text.classList.remove('animate-countdown');
+                void text.offsetWidth; 
+                text.classList.add('animate-countdown');
+            }
+
+            const countInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    text.innerText = count;
+                    refreshAnimation();
+                } else if (count === 0) {
+                    text.innerText = "DECRYPT";
+                    text.className = "text-5xl md:text-6xl font-bold text-emerald-400 sci-fi-text drop-shadow-[0_0_20px_rgba(16,185,129,0.8)] animate-countdown";
+                    refreshAnimation();
+                } else {
+                    clearInterval(countInterval);
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                    isGameRunning = true; 
+                    startTimer();
+                    
+                    // START PHASE 1
+                    startPhase1();
+                    document.getElementById('master-input').focus();
+                }
+            }, 1000);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            secondsElapsed = 0;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay() {
+            const timeString = formatTime(secondsElapsed);
+            document.getElementById('timer').innerText = timeString;
+            document.getElementById('final-time').innerText = timeString;
+        }
+
+        function formatTime(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        // --- PHASE 1: DECRYPTION LOGIC ---
+
+        function startPhase1() {
+            const container = document.getElementById('phase-1-decrypt');
+            const cloudEl = document.getElementById('data-cloud');
+            const listEl = document.getElementById('decrypted-list');
+            
+            container.classList.remove('hidden');
+            cloudEl.innerHTML = '';
+            listEl.innerHTML = '';
+
+            // 1. Flatten and shuffle all hints
+            let allHints = [];
+            originalData.forEach(item => {
+                item.hints.forEach(hint => {
+                    allHints.push({ text: hint, parentWord: item.word });
+                });
+            });
+            allHints.sort(() => 0.5 - Math.random()); // Shuffle
+
+            // 2. Render Hints as "Chips"
+            allHints.forEach((h, i) => {
+                const chip = document.createElement('div');
+                chip.className = 'hint-chip bg-slate-800 border border-slate-600 rounded-full px-4 py-2 text-xs md:text-sm text-slate-300 font-mono cursor-default hover:border-blue-400 hover:text-white transition-colors select-none';
+                chip.innerHTML = `<i class="fas fa-satellite-dish text-[10px] mr-2 text-blue-500/50"></i>${h.text}`;
+                chip.dataset.parent = h.parentWord;
+                // Random float delay
+                chip.style.animationDelay = `${Math.random() * 5}s`;
+                cloudEl.appendChild(chip);
+            });
+
+            // 3. Render Empty Word Slots
+            // Sort by length or name? Let's just do random or sorted to make it cleaner
+            const sortedWords = [...originalData].sort((a,b) => a.word.localeCompare(b.word));
+            sortedWords.forEach(item => {
+                const slot = document.createElement('div');
+                slot.className = 'word-slot bg-slate-900 border border-slate-700 px-3 py-1 rounded text-slate-600 font-mono text-xs font-bold tracking-widest';
+                slot.innerText = "LOCKED";
+                slot.dataset.word = item.word;
+                listEl.appendChild(slot);
+            });
+            
+            // Update progress text
+            document.getElementById('found-count').innerText = 0;
+        }
+
+        function checkMasterInput() {
+            const inputEl = document.getElementById('master-input');
+            const feedbackEl = document.getElementById('input-feedback');
+            const userText = inputEl.value.toUpperCase().trim();
+
+            if (!userText) return;
+
+            // Check if word exists in our database
+            const match = originalData.find(item => item.word === userText);
+
+            if (match) {
+                // Check if already found
+                if (decryptedWords.includes(match.word)) {
+                    feedbackEl.innerText = `ERROR: "${userText}" ALREADY DECRYPTED`;
+                    feedbackEl.className = "text-yellow-500 text-xs font-mono h-4 block tracking-widest";
+                    inputEl.value = "";
+                    return;
+                }
+
+                // SUCCESS: Word found
+                decryptedWords.push(match.word);
+                
+                // 1. Feedback UI
+                feedbackEl.innerText = `SUCCESS: DECRYPTED "${userText}"`;
+                feedbackEl.className = "text-green-500 text-xs font-mono h-4 block tracking-widest";
+                inputEl.value = "";
+
+                // 2. Highlight and Cross-out Hints
+                const hints = document.querySelectorAll(`.hint-chip[data-parent="${match.word}"]`);
+                hints.forEach(h => {
+                    h.classList.add('solved');
+                });
+
+                // 3. Reveal in List
+                const slot = document.querySelector(`.word-slot[data-word="${match.word}"]`);
+                if (slot) {
+                    slot.innerText = match.word;
+                    slot.classList.add('revealed');
+                }
+
+                // 4. Update Count
+                document.getElementById('found-count').innerText = decryptedWords.length;
+
+                // 5. Check Completion
+                if (decryptedWords.length === originalData.length) {
+                    setTimeout(() => {
+                        transitionToPhase2();
+                    }, 1500);
+                }
+
+            } else {
+                // ERROR: Word not found
+                feedbackEl.innerText = `ERROR: "${userText}" NO MATCH FOUND`;
+                feedbackEl.className = "text-red-500 text-xs font-mono h-4 block tracking-widest";
+                
+                // Shake effect on input
+                inputEl.parentElement.classList.add('animate-pulse', 'border-red-500');
+                setTimeout(() => inputEl.parentElement.classList.remove('animate-pulse', 'border-red-500'), 500);
+            }
+        }
+
+        function transitionToPhase2() {
+            const p1 = document.getElementById('phase-1-decrypt');
+            const p2 = document.getElementById('phase-2-grid');
+            
+            // Visual Transition
+            p1.classList.add('animate-pulse');
+            setTimeout(() => {
+                p1.classList.add('hidden');
+                p2.classList.remove('hidden');
+                
+                // Trigger Fade In
+                setTimeout(() => {
+                    p2.classList.remove('opacity-0');
+                }, 100);
+
+                // Initialize Phase 2 Components
+                renderGrid();
+                renderSidePanel();
+                
+                // Reset counter for Phase 2 (finding in grid)
+                document.getElementById('found-count').innerText = "0";
+                
+                // Notification
+                const notif = document.createElement('div');
+                notif.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-900/90 border border-blue-400 p-6 rounded-xl z-50 text-center shadow-2xl';
+                notif.innerHTML = `
+                    <h2 class="text-2xl font-bold text-white sci-fi-text mb-2">MATRIX LOADED</h2>
+                    <p class="text-blue-200">Keywords Decrypted. Locate them in the grid.</p>
+                `;
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 2000);
+
+            }, 500);
+        }
+
+        // --- PHASE 2: GRID LOGIC ---
+
+        function renderSidePanel() {
+            const container = document.getElementById('hints-container');
+            container.innerHTML = '';
+            
+            const sortedData = [...originalData].sort((a, b) => a.category.localeCompare(b.category));
+
+            sortedData.forEach((item) => {
+                const isStudy = item.category === "STUDY";
+                const cardClass = isStudy ? 'study' : 'leisure';
+                const icon = isStudy ? 'fa-microchip' : 'fa-rocket';
+                const colorText = isStudy ? 'text-blue-400' : 'text-orange-400';
+
+                const card = document.createElement('div');
+                card.className = `mission-card ${cardClass} p-3 rounded mb-2`;
+                card.dataset.word = item.word;
+                
+                // In Phase 2, the word is known!
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] ${colorText} font-bold tracking-widest uppercase font-mono"><i class="fas ${icon} mr-1"></i> ${item.category}</span>
+                                <i class="fas fa-square text-slate-700 status-icon text-xs"></i>
+                            </div>
+                            <div class="font-bold text-lg mb-1 sci-fi-text tracking-wide text-white">${item.word}</div>
+                            <div class="text-[10px] text-slate-400 truncate">${item.hints[0]}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderGrid() {
+            const gridEl = document.getElementById('word-grid');
+            gridEl.innerHTML = '';
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell text-sm md:text-base aspect-square font-mono';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.textContent = grid[y][x];
+                    
+                    // Events
+                    cell.addEventListener('mousedown', handleMouseDown);
+                    cell.addEventListener('mouseenter', handleMouseEnter);
+                    cell.addEventListener('touchstart', handleTouchStart, {passive: false});
+                    cell.addEventListener('touchmove', handleTouchMove, {passive: false});
+                    
+                    gridEl.appendChild(cell);
+                }
+            }
+            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('touchend', handleMouseUp);
+        }
+
+        // --- GRID INPUT HANDLERS (Same as before) ---
+        function placeWord(item) {
+            const word = item.word;
+            const directions = [{x: 1, y: 0}, {x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: -1}];
+            let placed = false;
+            let attempts = 0;
+            while (!placed && attempts < 100) {
+                const dir = directions[Math.floor(Math.random() * directions.length)];
+                const startX = Math.floor(Math.random() * GRID_SIZE);
+                const startY = Math.floor(Math.random() * GRID_SIZE);
+                if (canPlace(word, startX, startY, dir)) {
+                    for (let i = 0; i < word.length; i++) {
+                        grid[startY + i * dir.y][startX + i * dir.x] = word[i];
+                    }
+                    placedWords.push({
+                        word: word,
+                        category: item.category,
+                        coords: calculateCoords(word, startX, startY, dir)
+                    });
+                    placed = true;
+                }
+                attempts++;
+            }
+        }
+
+        function canPlace(word, startX, startY, dir) {
+            const endX = startX + (word.length - 1) * dir.x;
+            const endY = startY + (word.length - 1) * dir.y;
+            if (endX < 0 || endX >= GRID_SIZE || endY < 0 || endY >= GRID_SIZE) return false;
+            for (let i = 0; i < word.length; i++) {
+                const charAtGrid = grid[startY + i * dir.y][startX + i * dir.x];
+                if (charAtGrid !== '' && charAtGrid !== word[i]) return false;
+            }
+            return true;
+        }
+
+        function calculateCoords(word, startX, startY, dir) {
+            let coords = [];
+            for (let i = 0; i < word.length; i++) {
+                coords.push(`${startX + i * dir.x},${startY + i * dir.y}`);
+            }
+            return coords;
+        }
+
+        function fillEmptySpaces() {
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    if (grid[y][x] === '') {
+                        grid[y][x] = letters.charAt(Math.floor(Math.random() * letters.length));
+                    }
+                }
+            }
+        }
+
+        function handleMouseDown(e) {
+            if (!isGameRunning || decryptedWords.length < 10) return; // Only work in Phase 2
+            isSelecting = true;
+            selectionStart = { x: parseInt(e.target.dataset.x), y: parseInt(e.target.dataset.y) };
+            highlightSelection(selectionStart, selectionStart);
+        }
+
+        function handleMouseEnter(e) {
+            if (!isSelecting) return;
+            const current = { x: parseInt(e.target.dataset.x), y: parseInt(e.target.dataset.y) };
+            highlightSelection(selectionStart, current);
+        }
+
+        function handleTouchStart(e) {
+            if (!isGameRunning || decryptedWords.length < 10) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains('grid-cell')) handleMouseDown({target});
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isSelecting) return;
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains('grid-cell')) {
+                const current = { x: parseInt(target.dataset.x), y: parseInt(target.dataset.y) };
+                highlightSelection(selectionStart, current);
+            }
+        }
+
+        function handleMouseUp() {
+            if (!isSelecting) return;
+            isSelecting = false;
+            checkSelection();
+            clearHighlight();
+        }
+
+        function highlightSelection(start, end) {
+            document.querySelectorAll('.grid-cell.selected').forEach(el => el.classList.remove('selected'));
+            const cells = getCellsInLine(start, end);
+            if (cells) {
+                cells.forEach(pos => {
+                    document.querySelector(`.grid-cell[data-x="${pos.x}"][data-y="${pos.y}"]`).classList.add('selected');
+                });
+                selectionEnd = end;
+            } else {
+                selectionEnd = null;
+            }
+        }
+
+        function getCellsInLine(start, end) {
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const steps = Math.max(Math.abs(dx), Math.abs(dy));
+            if (steps === 0) return [{x: start.x, y: start.y}];
+            
+            const xInc = dx === 0 ? 0 : dx / Math.abs(dx);
+            const yInc = dy === 0 ? 0 : dy / Math.abs(dy);
+
+            if (dx !== 0 && dy !== 0 && Math.abs(dx) !== Math.abs(dy)) return null;
+
+            const path = [];
+            for (let i = 0; i <= steps; i++) {
+                path.push({x: start.x + i * xInc, y: start.y + i * yInc});
+            }
+            return path;
+        }
+
+        function checkSelection() {
+            if (!selectionEnd) return;
+            const path = getCellsInLine(selectionStart, selectionEnd);
+            if (!path) return;
+
+            let selectedWord = "";
+            path.forEach(pos => selectedWord += grid[pos.y][pos.x]);
+            const reversedWord = selectedWord.split('').reverse().join('');
+
+            const match = placedWords.find(pw => pw.word === selectedWord || pw.word === reversedWord);
+            if (match) markFound(match);
+        }
+
+        function clearHighlight() {
+            document.querySelectorAll('.grid-cell.selected').forEach(el => el.classList.remove('selected'));
+        }
+
+        function markFound(matchObj) {
+            const card = document.querySelector(`.mission-card[data-word="${matchObj.word}"]`);
+            if (card && card.classList.contains('solved')) return;
+
+            // Highlight Grid
+            const colorClass = matchObj.category === 'STUDY' ? 'study' : 'leisure';
+            matchObj.coords.forEach(coord => {
+                const [x, y] = coord.split(',');
+                const cell = document.querySelector(`.grid-cell[data-x="${x}"][data-y="${y}"]`);
+                cell.classList.add('found', colorClass);
+            });
+
+            // Update Card (in Phase 2)
+            if (card) {
+                card.classList.add('solved');
+                card.querySelector('.status-icon').className = 'fas fa-check text-green-400 status-icon text-xs';
+            }
+
+            // Update Score
+            foundWordsCounter++;
+            document.getElementById('found-count').innerText = foundWordsCounter;
+
+            // Win Condition Check
+            if (foundWordsCounter === originalData.length) {
+                stopTimer();
+                isGameRunning = false;
+                const delay = cheatReason === "HACK" ? 5000 : 500;
+                setTimeout(() => {
+                    showResultModal(!hasCheated);
+                }, delay);
+            }
+        }
+
+        function showResultModal(isSuccess) {
+            const modal = document.getElementById('result-modal');
+            const title = document.getElementById('modal-title');
+            const icon = document.getElementById('modal-icon');
+            const desc = document.getElementById('modal-desc');
+            const content = document.getElementById('modal-content');
+
+            modal.classList.remove('hidden');
+
+            if (isSuccess) {
+                title.innerText = "MISSION ACCOMPLISHED";
+                title.className = "text-3xl font-bold text-white mb-2 sci-fi-text tracking-widest";
+                icon.className = "fas fa-medal text-6xl text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]";
+                desc.innerText = "All vocabulary data has been successfully retrieved.";
+                content.classList.remove('border-red-500');
+                content.classList.add('border-blue-500');
+            } else {
+                title.innerText = "MISSION FAILED";
+                title.className = "text-3xl font-bold text-red-500 mb-2 sci-fi-text tracking-widest";
+                icon.className = "fas fa-exclamation-triangle text-6xl text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]";
+                content.classList.remove('border-blue-500');
+                content.classList.add('border-red-500');
+
+                if (cheatReason === "HACK") {
+                    desc.innerText = "Unauthorized system override detected. Mission invalidated.";
+                } else if (cheatReason === "TAB_SWITCH") {
+                    desc.innerText = "Signal interrupted: Focus lost. Auto-submitted as incomplete.";
+                } else {
+                    desc.innerText = "Mission failed due to security protocol violation.";
+                }
+            }
+        }
+
+        // Start
+        initGame();
+
+    </script>
+</body>
+</html>
